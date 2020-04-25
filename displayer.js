@@ -13,6 +13,7 @@ class TextDisplayer {
     $.ajax({
       type: 'GET',
       url,
+      dataType: 'json',
       complete: () => {
         $('.displayer__text-loading').hide();
       },
