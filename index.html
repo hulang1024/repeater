@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="vendors/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>Repeater</title>
+</head>
+<body class="container-fluid">
+  <div class="text-displayer">
+  </div>
+  <div class="player">
+    <audio controls />
+    <div class="player__play-speed dropup">
+      <button
+        class="btn btn-default dropdown-toggle"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+        id="play-speed-menu"
+      >
+        播放速度:<span id="play-speed-text">100%</span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="play-speed-menu">
+      </ul>
+    </div>
+  </div>
+  <script src="vendors/jquery.js"></script>
+  <script src="vendors/bootstrap.min.js"></script>
+  <script src="audio-player.js"></script>
+  <script src="text-displayer.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
