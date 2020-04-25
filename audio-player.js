@@ -1,15 +1,19 @@
 class AudioPlayer {
   constructor() {
-    this.el = document.querySelector('.player');
-    const audio = document.querySelector('.player audio');
+    this.el = document.querySelector('.audio-player');
+    const audio = document.querySelector('.audio-player audio');
     this.audio = audio;
-    audio.src = 'https://raw.githubusercontent.com/hulang1024/repeater/master/data/count.mp3';
+    audio.loop = true;
+
+    this.timeUpdateListeners = [];
 
     /* 原生timeupdate事件频率不高，setInterval代替实现 */
     let timeUpdateTimer = null;
     const startTimeUpdateTimer = () => {
       timeUpdateTimer = setInterval(() => {
-        this.textDisplayer.onTimeUpdate(getAudioCurrentMS());
+        this.timeUpdateListeners.forEach((listener) => {
+          listener(audio.currentTime);
+        });
       }, 5);
     }
 
@@ -22,42 +26,38 @@ class AudioPlayer {
       clearInterval(timeUpdateTimer);
     }
 
-    audio.onseeked = () => {
-      this.textDisplayer.onSeeked(getAudioCurrentMS());
-    }
-
-    audio.onended = () => {
-      this.textDisplayer.onEnded();
-    }
-    
-    function getAudioCurrentMS() {
-      return Math.round(audio.currentTime * 1000);
-    }
-
-    this.el.appendChild(new PlaySpeedController(this).el);
+    this.el.appendChild(new _PlaySpeedController(this).el);
   }
 
-  setCurrentTime(ms) {
-    this.audio.currentTime = ms / 1000;
+  addAudioTimeUpdateListener(listener) {
+    this.timeUpdateListeners.push(listener);
   }
 
-  setTextDisplayer(textDisplayer) {
-    this.textDisplayer = textDisplayer;
+  removeAudioTimeUpdateListener(listener) {
+    this.timeUpdateListeners = this.timeUpdateListeners.filter(l => l != listener);
+  }
+
+  loadAudio({url}) {
+    this.audio.src = url;
+  }
+
+  play() {
+    this.audio.play();
   }
 }
 
-class PlaySpeedController {
+class _PlaySpeedController {
   constructor(player) {
-    this.el = $('.player__play-speed').get(0);
-    const menu = $('.player__play-speed .dropdown-menu');
+    this.el = $('.audio-player__play-speed').get(0);
+    const menu = $('.dropdown-menu', this.el);
     for (var n = 25; n <= 200; n += 25) {
       menu.append($('<li>').append($('<a>')
+        .data('value', n / 100)
+        .text(n + '%')
         .click(function() {
           player.audio.playbackRate = +$(this).data('value');
           $('#play-speed-text').text($(this).text());
-        })
-        .data('value', n / 100)
-        .text(n + '%')));
+        })));
     }
     this.el.appendChild(menu.get(0));
   }
