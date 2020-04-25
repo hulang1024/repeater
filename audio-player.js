@@ -3,7 +3,7 @@ class AudioPlayer {
     this.el = document.querySelector('.player');
     const audio = document.querySelector('.player audio');
     this.audio = audio;
-    audio.src = '/data/count.mp3';
+    audio.src = 'https://raw.githubusercontent.com/hulang1024/repeater/master/data/count.mp3';
 
     /* 原生timeupdate事件频率不高，setInterval代替实现 */
     let timeUpdateTimer = null;
