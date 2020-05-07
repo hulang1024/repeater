@@ -1,4 +1,4 @@
-class TextDisplayer {
+export default class TextDisplayer {
   constructor({audioPlayer}) {
     this.audioPlayer = audioPlayer;
     this.el = document.querySelector('.displayer');
@@ -22,7 +22,9 @@ class TextDisplayer {
         this._renderText(data);
 
         const { audio } = this.audioPlayer;
-        this.onSeeked(audio.currentTime);
+        if (audio.currentTime > 0) {
+          this.onSeeked(audio.currentTime);
+        }
         audio.addEventListener('seeked', this.onSeeked);
         this.audioPlayer.addAudioTimeUpdateListener(this.onTimeUpdate);
       },
@@ -34,13 +36,14 @@ class TextDisplayer {
 
   _setAudioEventListeners() {
     const { audio } = this.audioPlayer;
-
+    const offset = 0;
     const toMS = (s) => Math.round(s * 1000);
+
     this.onSeeked = () => {
-      this._onSeeked(toMS(audio.currentTime));
+      this._onSeeked(toMS(audio.currentTime) + offset);
     };
     this.onTimeUpdate = () => {
-      this._onTimeUpdate(toMS(audio.currentTime));
+      this._onTimeUpdate(toMS(audio.currentTime) + offset);
     };
 
     audio.addEventListener('loadstart', () => {
@@ -80,12 +83,11 @@ class TextDisplayer {
       words[this.currIndex - 1].highlight();
       this.lastIndex = this.currIndex - 1;
     }
-    this.onTimeUpdate(time, false);
+    this.onTimeUpdate(time);
   }
 
-  _onTimeUpdate(time, seeking) {
+  _onTimeUpdate(time) {
     const { words } = this;
-    if (seeking) return;
     if (this.currIndex > words.length - 1) return;
     if (time < words[this.currIndex].time) return;
     words[this.lastIndex].unhighlight();
@@ -108,8 +110,12 @@ class TextDisplayer {
           text: wordData[0],
           time: wordData[1],
           onClick: () => {
-            this.audioPlayer.audio.currentTime = word.time / 1000;
-            this.audioPlayer.play();
+            const { audio } = this.audioPlayer;
+            audio.currentTime = word.time / 1000;
+            this.onSeeked(audio.currentTime);
+            if (audio.paused) {
+              audio.play();
+            }
           }
         });
         this.words.push(word);
@@ -125,10 +131,9 @@ class Word {
     this.text = text;
     this.time = time;
     this.el = $('<span>')
-      .text(text)
+      .addClass('word')
       .css({
-        padding: '0px 4px',
-        cursor: 'pointer'
+        padding: '2px 4px',
       })
       .click(() => {
         onClick.call(this);
@@ -141,7 +146,9 @@ class Word {
         () => {
           if (!this.highlighted)
             this._setHighlight(false);
-        }).get(0);
+        })
+      .text(text)
+      .get(0);
   }
 
   highlight() {
@@ -156,8 +163,8 @@ class Word {
   _setHighlight(b) {
     $(this.el).css({
       background: b ? 'blue' : '',
-      borderBottom: b ? '2px solid red' : '',
-      borderRadius: b ? '2px' : ''
+      borderBottom: b ? '3px solid red' : '',
+      borderRadius: b ? '3px' : ''
     });
   }
 }

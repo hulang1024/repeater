@@ -1,9 +1,8 @@
-class AudioPlayer {
+export default class AudioPlayer {
   constructor() {
     this.el = document.querySelector('.audio-player');
     const audio = document.querySelector('.audio-player audio');
     this.audio = audio;
-    audio.loop = true;
 
     this.timeUpdateListeners = [];
 
@@ -18,7 +17,6 @@ class AudioPlayer {
     }
 
     audio.onplay = () => {
-      clearInterval(timeUpdateTimer);
       startTimeUpdateTimer();
     }
 
@@ -40,17 +38,13 @@ class AudioPlayer {
   loadAudio({url}) {
     this.audio.src = url;
   }
-
-  play() {
-    this.audio.play();
-  }
 }
 
 class _PlaySpeedController {
   constructor(player) {
     this.el = $('.audio-player__play-speed').get(0);
     const menu = $('.dropdown-menu', this.el);
-    for (var n = 25; n <= 200; n += 25) {
+    for (let n = 25; n <= 200; n += 25) {
       menu.append($('<li>').append($('<a>')
         .data('value', n / 100)
         .text(n + '%')
